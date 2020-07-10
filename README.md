@@ -1,39 +1,70 @@
-<img src="https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png" style="margin: 0;">
+## How to get MongoDB running with Python in GitPod
 
-Welcome USER_NAME,
+1: Install the following using the terminal
+- pip3 install dnspython
+- pip3 install pymongo
 
-This is the Code Institute student template for Gitpod. We have preinstalled all of the tools you need to get started. You can safely delete this README.md file, or change it for your own project.
+2: If you don't have a .gitignore file yet, in the root of your project create .gitignore with env.py in it, using the following command in the Terminal:
+- echo env.py > .gitignore
 
-## Gitpod Reminders
+If you already have a .gitignore file, add env.py to it and save the file.
 
-To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
+3: Create TWO Python files
+- app.py / run.py (Main project file)
+- env.py (Sensitive data)
 
-`python3 -m http.server`
+4: Add the following code to 'env.py' file and change accordingly to connect your database
 
-A blue button should appear to click: *Make Public*,
+import os   
 
-Another blue button should appear to click: *Open Browser*.
+os.environ["SECRET_KEY"] = "somesupersecretkey"<br>
+os.environ["MONGO_URI"] = "mongodb+srv://username:supersecretpassword@myfirstcluster-a123b.mongodb.net/mydatabase?retryWrites=true&w=majority"
 
-To run a backend Python file, type `python3 app.py`, if your Python file is named `app.py` of course.
+5: Add the following code to 'app.py'(main project file)
 
-A blue button should appear to click: *Make Public*,
+import os 
 
-Another blue button should appear to click: *Open Browser*.
+if os.path.exists("env.py"):<br>
+    import env
 
-In Gitpod you have superuser security privileges by default. Therefore you do not need to use the `sudo` (superuser do) command in the bash terminal in any of the backend lessons.
+NOTE: The above may show an error in the file but it should work
 
-## Updates Since The Instructional Video
+## Troubleshooting
+If youre still having issues, try the following:
+- Make sure to save all files before running in Python
+- The URI and variables are case sensitive so double check the capitalisation is correct
+- Try using the secure password generator in the MongoDB Atlas as sometimes weak passwords are the issue!
 
-We continually tweak and adjust this template to help give you the best experience. Here are the updates since the original video was made:
+### The code I used in the main Python file, to get MongoDB running was...
 
-**April 16 2020:** The template now automatically installs MySQL instead of relying on the Gitpod MySQL image. The message about a Python linter not being installed has been dealt with, and the set-up files are now hidden in the Gitpod file explorer.
+import pymongo<br>
+import os
 
-**April 13 2020:** Added the _Prettier_ code beautifier extension instead of the code formatter built-in to Gitpod.
+if os.path.exists("env.py"):<br>
+    import env
 
-**February 2020:** The initialisation files now _do not_ auto-delete. They will remain in your project. You can safely ignore them. They just make sure that your workspace is configured correctly each time you open it. It will also prevent the Gitpod configuration popup from appearing.
+MONGO_URI = os.environ.get("MONGO_URI")<br>
+secret_key = os.environ.get("somesupersecretkey")
 
-**December 2019:** Added Eventyret's Bootstrap 4 extension. Type `!bscdn` in a HTML file to add the Bootstrap boilerplate. Check out the <a href="https://github.com/Eventyret/vscode-bcdn" target="_blank">README.md file at the official repo</a> for more options.
+MONGODB_URI = os.getenv("MONGO_URI")<br>
+DBS_NAME = "myTestDB"<br>
+COLLECTION_NAME = "MyFirstMDB"
 
---------
 
-Happy coding!
+def mongo_connect(url):<br>
+    try:<br>
+        conn = pymongo.MongoClient(url)<br>
+        print("Mongo is connected!")<br>
+        return conn<br>
+    except pymongo.errors.ConnectionFailure as e:<br>
+        print("Could not connect to MongoDB: %s") % e<br>
+
+
+conn = mongo_connect(MONGODB_URI)
+
+coll = conn[DBS_NAME][COLLECTION_NAME]
+
+documents = coll.find()
+
+for doc in documents:
+    print(doc)
